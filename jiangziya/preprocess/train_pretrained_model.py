@@ -1,6 +1,7 @@
-from jiangziya.fast_text.fast_text import PretrainedFastText
+from jiangziya.text_cnn.pretrained_text_cnn import PretrainedTextCNN
 from jiangziya.utils.config import get_model_dir, get_data_dir, get_log_dir
-from jiangziya.fast_text.dataset import get_pretrained_dataset
+from jiangziya.text_cnn.pretrained_dataset import get_dataset
+from jiangziya.preprocess.get_word_vector_dict import load_word_vector_dict
 import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 import time
@@ -8,9 +9,11 @@ import os
 import pickle
 
 
-def train_pretrained_fast_text():
-    total_num_train = 669589 # num_lines of thucnews_train_vec.txt
-    total_num_val = 83316 # num_lines of thucnews_val_vec.txt
+def train_model():
+    total_num_train = 669589 # num_lines of thucnews_train_seg.txt
+    total_num_val = 83316 # num_lines of thucnews_test_seg.txt
+
+    max_seq_len = 350 # avg #words in sequence = 380, remove stop-words will go to ~350.
 
     num_classes = 14
     epochs = 100
@@ -19,30 +22,42 @@ def train_pretrained_fast_text():
     batch_size = 32
     patience = 10 # for early stopping
 
-    data_dir = os.path.join(get_data_dir(), "text_classification")
-    train_path = os.path.join(data_dir, "thucnews_train_vec.txt")
-    val_path = os.path.join(data_dir, "thucnews_val_vec.txt")
+    model_name = "pretrained_text_cnn"
 
-    log_dir = os.path.join(get_log_dir(), "fast_text")
-    checkpoint_path = os.path.join(get_model_dir(), "fast_text", "ckpt")
-    history_path = os.path.join(get_log_dir(), "history", "fast_text.pkl")
+    data_dir = os.path.join(get_data_dir(), "text_classification")
+    train_path = os.path.join(data_dir, "thucnews_train_seg.txt")
+    val_path = os.path.join(data_dir, "thucnews_test_seg.txt")
+
+    log_dir = os.path.join(get_log_dir(), model_name)
+    checkpoint_path = os.path.join(get_model_dir(), model_name, "ckpt")
+    history_path = os.path.join(get_log_dir(), "history", model_name + ".pkl")
+
+    word_vector_dict_path = os.path.join(get_model_dir(), "sogou_vectors.pkl")
+
+    # === Load word_vec_dict
+    word_vec_dict = load_word_vector_dict(word_vector_dict_path=word_vector_dict_path)
+    print("#word_vec_dict = %d" % len(word_vec_dict))
 
     num_train_batch = total_num_train // batch_size + 1
     num_val_batch = total_num_val // batch_size + 1
 
     # === tf.data.Dataset
-    train_dataset = get_pretrained_dataset(data_path=train_path,
+    train_dataset = get_dataset(data_path=train_path,
                                 epochs=epochs,
                                 shuffle_buffer_size=shuffle_buffer_size,
-                                batch_size=batch_size)
+                                batch_size=batch_size,
+                                max_seq_len=max_seq_len,
+                                word_vec_dict=word_vec_dict)
 
-    val_dataset = get_pretrained_dataset(data_path=val_path,
+    val_dataset = get_dataset(data_path=val_path,
                               epochs=epochs,
                               shuffle_buffer_size=shuffle_buffer_size,
-                              batch_size=batch_size)
+                              batch_size=batch_size,
+                              max_seq_len=max_seq_len,
+                              word_vec_dict=word_vec_dict)
 
     # === model
-    model = PretrainedFastText(num_classes=num_classes)
+    model = PretrainedTextCNN(num_classes=num_classes)
 
     # optimizer
     optimizer = tf.keras.optimizers.Adam(0.001)
@@ -85,7 +100,7 @@ def train_pretrained_fast_text():
 
 if __name__ == "__main__":
     start = time.time()
-    train_pretrained_fast_text()
+    train_model()
     end = time.time()
     last = end - start
     print("\nTrain done! Lasts: %.2fs" % last)

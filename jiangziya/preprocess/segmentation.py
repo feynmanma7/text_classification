@@ -1,6 +1,6 @@
 from jiangziya.utils.config import get_data_dir
 from jiangziya.utils.dictionary import get_stopwords_dict
-from jiangziya.utils.time_util import print_time
+from jiangziya.utils.print_util import print_time
 import jieba
 import os
 
@@ -51,9 +51,9 @@ def segmentation_file(file_path=None, seg_path=None, stopwords_dict=None):
 
 
 if __name__ == '__main__':
-    file_type = "thucnews_train"
+    #file_type = "thucnews_train"
     #file_type = "thucnews_val"
-    #file_type = "thucnews_test"
+    file_type = "thucnews_test"
 
     file_name = "shuf_" + file_type + ".txt" # use shuffled file to seg
     seg_file_name = file_type + "_seg.txt"

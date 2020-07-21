@@ -64,6 +64,10 @@ num_files of each class:
 
 # 4. Performance
 
+|method|accuracy|f1_micro|f1_marco|f1_weighted|
+|---|---|---|---|---|
+|FastText|0.9326|0.9326|0.9149|0.9324|
+
 # Reference
 
 1. 知乎: 中文文本分类 pytorch实现, [https://zhuanlan.zhihu.com/p/73176084](https://zhuanlan.zhihu.com/p/73176084)

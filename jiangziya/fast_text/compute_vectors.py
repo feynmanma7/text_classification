@@ -1,6 +1,6 @@
 from jiangziya.utils.config import get_data_dir, get_model_dir
 from jiangziya.preprocess.get_word_vector_dict import load_word_vector_dict
-from jiangziya.utils.time_util import print_time
+from jiangziya.utils.print_util import print_time
 import os, copy
 
 
@@ -14,6 +14,9 @@ def compute_vectors(text_path=None, vec_path=None, word_vec_dict=None):
             line_cnt = 0
             for line in fr:
                 buf = line[:-1].strip().split('\t')
+                if len(buf) != 3:
+                    print(line)
+                    continue
                 label = buf[0]
                 title = buf[1].split(' ')
                 text = buf[2].split(' ')
@@ -43,7 +46,9 @@ def compute_vectors(text_path=None, vec_path=None, word_vec_dict=None):
 
 
 if __name__ == '__main__':
-    file_type = "thucnews_train"
+    #file_type = "thucnews_train"
+    #file_type = "thucnews_val"
+    file_type = "thucnews_test"
     text_path = os.path.join(get_data_dir(), "text_classification", file_type + "_seg.txt")
     vec_path = os.path.join(get_data_dir(), "text_classification", file_type + "_vec.txt")
 
