@@ -15,6 +15,11 @@ def train_model():
 
     max_seq_len = 350 # avg #words in sequence = 380, remove stop-words will go to ~350.
 
+    filters = 10
+    kernel_size = 5
+    dense_units = 16
+    dropout_keep_ratio = 0.5
+
     num_classes = 14
     epochs = 100
     #epochs = 3

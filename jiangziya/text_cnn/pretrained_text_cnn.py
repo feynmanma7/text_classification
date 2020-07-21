@@ -45,9 +45,9 @@ class PretrainedTextCNN(tf.keras.Model):
 		return softmax
 
 
-def test_model_once(model=None):
+def test_model_once(model=None, seq_len=350):
 	batch_size = 4
-	seq_len = 10
+	#seq_len = 350
 	embedding_dim = 300
 	inputs = tf.random.uniform((batch_size, seq_len, embedding_dim))
 	outputs = model(inputs)
