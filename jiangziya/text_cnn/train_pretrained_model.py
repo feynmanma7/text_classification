@@ -15,9 +15,9 @@ def train_model():
 
     max_seq_len = 350 # avg #words in sequence = 380, remove stop-words will go to ~350.
 
-    filters = 10
+    filters = 100
     kernel_size = 5
-    dense_units = 16
+    dense_units = 128 # 3 * filters ==> dense_units ==> 14
     dropout_keep_ratio = 0.5
 
     num_classes = 14
@@ -38,7 +38,7 @@ def train_model():
     history_path = os.path.join(get_log_dir(), "history", model_name + ".pkl")
 
     word_vector_dict_path = os.path.join(get_model_dir(), "sogou_vectors.pkl")
-
+    print('word_vector', word_vector_dict_path)
     # === Load word_vec_dict
     word_vec_dict = load_word_vector_dict(word_vector_dict_path=word_vector_dict_path)
     print("#word_vec_dict = %d" % len(word_vec_dict))
@@ -62,7 +62,12 @@ def train_model():
                               word_vec_dict=word_vec_dict)
 
     # === model
-    model = PretrainedTextCNN(num_classes=num_classes)
+    model = PretrainedTextCNN(num_classes=num_classes,
+                              filters=filters,
+                              kernel_size=kernel_size,
+                              dense_units=dense_units,
+                              dropout_keep_ratio=dropout_keep_ratio,
+                              max_seq_len=max_seq_len)
 
     # optimizer
     optimizer = tf.keras.optimizers.Adam(0.001)
