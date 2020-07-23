@@ -43,7 +43,8 @@ def evaluation(test_result_path):
 if __name__ == '__main__':
 
     #method = "fast_text"
-    method = "pretrained_text_cnn"
+    #method = "pretrained_text_cnn"
+    method = "nb"
 
     data_dir = os.path.join(get_data_dir(), "text_classification")
     test_result_path = os.path.join(data_dir, "thucnews_test_" + method + ".txt")
