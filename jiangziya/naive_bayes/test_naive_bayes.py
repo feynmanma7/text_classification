@@ -3,7 +3,8 @@ import os, time
 from jiangziya.naive_bayes.naive_bayes import NaiveBayes
 
 if __name__ == '__main__':
-    test_path = os.path.join(get_train_data_dir(), "thucnews_test_seg.txt")
+    #test_path = os.path.join(get_train_data_dir(), "thucnews_test_seg.txt")
+    test_path = os.path.join(get_train_data_dir(), "tmp_seg.txt")
     test_result_path = os.path.join(get_train_data_dir(), "thucnews_test_nb.txt")
     model_path = os.path.join(get_model_dir(), "naive_bayes.pkl")
 

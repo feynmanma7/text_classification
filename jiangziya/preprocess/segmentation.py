@@ -1,5 +1,5 @@
 from jiangziya.utils.config import get_data_dir
-from jiangziya.utils.dictionary import get_stopwords_dict
+from jiangziya.preprocess.stopwords import load_stopwords_dict
 from jiangziya.utils.print_util import print_time
 import jieba
 import os
@@ -60,10 +60,11 @@ if __name__ == '__main__':
     file_path = os.path.join(get_data_dir(), "text_classification", file_name)
     seg_path = os.path.join(get_data_dir(), "text_classification", seg_file_name)
 
-    stopwords_path = os.path.join(get_data_dir(), "nlp", "baidu_stopwords.txt")
+    #stopwords_path = os.path.join(get_data_dir(), "nlp", "baidu_stopwords.txt")
+    stopwords_dict_path = os.path.join(get_data_dir(), "nlp", "stopwords_dict.pkl")
 
     # === Load stopwords_dict
-    stopwords_dict = get_stopwords_dict(stopwords_dict_path_list=[stopwords_path])
+    stopwords_dict = load_stopwords_dict(stopwords_dict_path=stopwords_dict_path)
     print("#stopwords_dict = %d" % len(stopwords_dict))
 
     # === Segmentation
