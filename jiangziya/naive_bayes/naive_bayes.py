@@ -1,4 +1,5 @@
 from jiangziya.utils.config import get_train_data_dir, get_model_dir, get_label_dict
+from jiangziya.utils.dictionary import load_pickle_dict
 import os, pickle, time
 import numpy as np
 
@@ -18,7 +19,7 @@ class NaiveBayes:
 		# {label_name: {word: prob}}, {word: prob} <== {word: word_in_num_doc_label / num_doc_label}
 		self.label_word_prob = {}
 
-	def fit(self, train_path=None):
+	def fit(self, train_path=None, chosen_word_dict=None):
 		# train: label_name \t title_words \t text_words
 
 		with open(train_path, 'r', encoding='utf-8') as fr:
@@ -47,6 +48,8 @@ class NaiveBayes:
 				# VSM, 0-1 for a word
 				word_dict = {} # {word: True}
 				for word in (title + ' ' + text).split(' '):
+					if word not in chosen_word_dict: # add feature selection
+						continue
 					if word in word_dict:
 						continue
 					word_dict[word] = True
@@ -69,11 +72,12 @@ class NaiveBayes:
 				self.label_prob[label_name] = (label_count + 1) / (N + len(self.label_count))
 
 			# === Normalize p(X_i = x_i | y = C_k)
+			V = len(chosen_word_dict)
 			for label_name, word_doc_count_dict in self.label_word_count.items():
 				#N_k = sum(word_doc_count_dict.values())
 				N_k = self.label_count[label_name]
 				for word, doc_count in word_doc_count_dict.items():
-					self.label_word_prob[label_name][word] = (doc_count + 1) / (N_k + 2)
+					self.label_word_prob[label_name][word] = (doc_count + 1) / (N_k + V)
 
 	def save_model(self, model_path=None):
 		with open(model_path, 'wb') as fw:
@@ -94,18 +98,10 @@ class NaiveBayes:
 			self.label_word_prob = model_dict['label_word_prob']
 			print("Load model done! %s" % model_path)
 
-	def predict_on_file(self, test_path=None, test_result_path=None):
+	def predict_on_file(self, test_path=None, test_result_path=None, chosen_word_dict=None):
 		# test_data: label_name \t title \t text
 		fw = open(test_result_path, 'w', encoding='utf-8')
 		line_cnt = 0
-
-		total_log_neg_prob_dict = {} # {label_name: \sum np.log(neg_prob)
-		for label_name, word_prob_dict in self.label_word_prob.items():
-			total_log_neg_prob = 0
-			for word, pos_prob in word_prob_dict.items():
-				neg_prob = 1.0 - pos_prob
-				total_log_neg_prob += np.log(neg_prob)
-			total_log_neg_prob_dict[label_name] = total_log_neg_prob
 
 		with open(test_path, 'r', encoding='utf-8') as fr:
 			label_dict = get_label_dict() # {label_name: label_index}
@@ -122,23 +118,26 @@ class NaiveBayes:
 				word_dict = {} # {word: True}
 				for word in (title + ' ' + text).split(' '):
 					word = word.strip()
+					if word not in chosen_word_dict: # feature selection
+						continue
 					if word in word_dict:
 						continue
 					word_dict[word] = True
 
 				probs = {} # {label_name: prob}
+				V = len(chosen_word_dict)
 				for label_name, label_prob in self.label_prob.items():
 					prob = np.log(label_prob)
+					N_k = self.label_count[label_name]
 					for word in word_dict.keys():
 						if word not in self.label_word_prob[label_name]:
-							continue
-						word_pos_prob = self.label_word_prob[label_name][word]
-						#word_neg_prob = 1.0 - word_pos_prob
-						#prob += (np.log(word_pos_prob) - np.log(word_neg_prob))
+							#continue
+							word_pos_prob = 1. / (N_k + V)
+							#print(label_name, word, word_pos_prob)
+						else:
+							word_pos_prob = self.label_word_prob[label_name][word]
 						prob += np.log(word_pos_prob)
 
-					#total_log_neg_prob = total_log_neg_prob_dict[label_name]
-					#probs[label_name] = prob + total_log_neg_prob
 					probs[label_name] = prob
 
 				# === Sort by prob, DESC
@@ -155,13 +154,17 @@ class NaiveBayes:
 
 
 if __name__ == "__main__":
-	#train_path = os.path.join(get_train_data_dir(), "thucnews_train_seg.txt")
-	train_path = os.path.join(get_train_data_dir(), "thucnews_val_seg.txt")
+	train_path = os.path.join(get_train_data_dir(), "thucnews_train_seg.txt")
+	#train_path = os.path.join(get_train_data_dir(), "thucnews_val_seg.txt")
 	model_path = os.path.join(get_model_dir(), "naive_bayes.pkl")
+	chosen_word_dict_path = os.path.join(get_train_data_dir(), "chosen_word_dict.pkl")
+
+	chosen_word_dict = load_pickle_dict(chosen_word_dict_path)
+	print("#chosen_word_dict = %d" % len(chosen_word_dict))
 
 	start = time.time()
 	nb = NaiveBayes()
-	nb.fit(train_path=train_path)
+	nb.fit(train_path=train_path, chosen_word_dict=chosen_word_dict)
 	end = time.time()
 	last = end - start
 	print("Train done! Lasts %.2fs" % last)

@@ -84,4 +84,10 @@ For programming,
 
 5. For each label, sort word by $\chi^2$, do feature selection.
 
-# 
+# 2. Mutual information
+
+> $I(x, y) = \sum_y\sum_x p(x, y) \log \frac{p(x, y)}{p(x) * p(y)}$ 
+
+# 3. Information gain
+
+> $IG(x) = H(Y) - H(Y|X=x)$

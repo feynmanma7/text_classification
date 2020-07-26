@@ -1,5 +1,5 @@
 from jiangziya.utils.config import get_data_dir, get_model_dir, get_label_dict
-from sklearn.metrics import classification_report, f1_score, accuracy_score
+from sklearn.metrics import classification_report, f1_score, accuracy_score, recall_score
 import os
 
 
@@ -28,11 +28,14 @@ def evaluation(test_result_path):
         print('\n')
 
         accuracy = accuracy_score(y_true, y_pred)
+        #recall = recall_score(y_true, y_pred, average='micro')
+        #precision_recall_curve(y_true, y_pred)
         f1_micro = f1_score(y_true, y_pred, average='micro')
         f1_macro = f1_score(y_true, y_pred, average='macro')
         f1_weighted = f1_score(y_true, y_pred, average='weighted')
 
         result_dict = {'accuracy': accuracy,
+                       'recall': recall,
                   'f1_micro': f1_micro,
                   'f1_marco': f1_macro,
                   'f1_weighted': f1_weighted}
