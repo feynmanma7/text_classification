@@ -1,5 +1,5 @@
 from jiangziya.utils.config import get_train_data_dir, get_model_dir
-from jiangziya.utils.dictionary import load_pickle_dict
+from jiangziya.utils.dictionary import load_dict
 import os, time
 from jiangziya.naive_bayes.naive_bayes import NaiveBayes
 
@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     chosen_word_dict_path = os.path.join(get_train_data_dir(), "chosen_word_dict.pkl")
 
-    chosen_word_dict = load_pickle_dict(chosen_word_dict_path)
+    chosen_word_dict = load_dict(chosen_word_dict_path)
     print("#chosen_word_dict = %d" % len(chosen_word_dict))
 
     start = time.time()

@@ -4,7 +4,7 @@ from sklearn.datasets import load_svmlight_file
 import time, joblib
 
 if __name__ == '__main__':
-    test_path = os.path.join(get_train_data_dir(), "test_libsvm.txt")
+    test_path = os.path.join(get_train_data_dir(), "test_tfidf.txt")
     test_result_path = os.path.join(get_train_data_dir(), "thucnews_test_sk_libsvm.txt")
     model_path = os.path.join(get_model_dir(), "sk_libsvm.pkl")
 

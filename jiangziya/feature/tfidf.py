@@ -1,6 +1,7 @@
 from jiangziya.utils.config import get_train_data_dir
 import os
 
+
 class TfIdf:
 	def __init__(self):
 		pass

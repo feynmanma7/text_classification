@@ -58,15 +58,15 @@ num_files of each class:
 > shuf a.txt > b.txt (for Unix/Linux)
 > gshuf a.txt > b.txt (for MacOS)
 
-
-
-# 3. Evaluation Metrics
-
-# 4. Performance
+# 3. Evaluation
 
 |method|accuracy|f1_micro|f1_marco|f1_weighted|
 |---|---|---|---|---|
-|FastText|0.9326|0.9326|0.9149|0.9324|
+|Word2vec FastText, 3 epochs|0.9326|0.9326|0.9149|0.9324|
+|Word2vec FastText, 11 epochs|0.9377|0.9377|0.9216|0.9375|
+|Word2vec FastText, Stop|0.9373|0.9373|0.9216|0.9371|
+|Facebook FastText|0.9496|0.9496|0.9380|0.9496|
+|Naive Bayes + Chi-square|0.8211|0.8211|0.8138|0.8273|
 
 # Reference
 

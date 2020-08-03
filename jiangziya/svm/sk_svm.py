@@ -7,17 +7,18 @@ import time, joblib
 
 if __name__ == '__main__':
 
-    train_path = os.path.join(get_train_data_dir(), "train_libsvm.txt")
+    train_path = os.path.join(get_train_data_dir(), "train_tfidf.txt")
     model_path = os.path.join(get_model_dir(), "sk_libsvm.pkl")
 
-    clf = svm.SVC(C=100, kernel='linear')
+    #clf = svm.SVC(C=100, kernel='linear')
+    clf = svm.SVC()
     print(clf)
 
     start = time.time()
     X, y = load_svmlight_file(train_path)
     end = time.time()
     last = end - start
-    print("Load lasts %.2f" % last)
+    print("Load lasts %.2fs" % last)
 
     start = time.time()
     clf.fit(X, y)

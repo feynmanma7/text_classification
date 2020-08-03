@@ -35,7 +35,6 @@ def evaluation(test_result_path):
         f1_weighted = f1_score(y_true, y_pred, average='weighted')
 
         result_dict = {'accuracy': accuracy,
-                       'recall': recall,
                   'f1_micro': f1_micro,
                   'f1_marco': f1_macro,
                   'f1_weighted': f1_weighted}

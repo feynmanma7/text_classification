@@ -1,8 +1,8 @@
 import pickle
 
 
-def load_pickle_dict(pickle_dict_path=None):
-    with open(pickle_dict_path, 'rb') as fr:
+def load_dict(dict_path=None):
+    with open(dict_path, 'rb') as fr:
         pickle_dict = pickle.load(fr)
         return pickle_dict
 

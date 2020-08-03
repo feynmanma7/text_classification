@@ -55,3 +55,13 @@ To compute
 > $= \arg\max_{C_k} \sum (+_1, +_2)+ \sum (-_3, -_4, -_5)$
 
 > $= \arg\max_{C_k} \sum (+_1, +_2) + (\sum_{i=1}^5 -_i) - \sum (-_1, -_2)$
+
+# Evaluation 
+
+For text classification, 
+
+Naive Bayes + Chi-square (50 words per label)
+
+|method|accuracy|f1_micro|f1_marco|f1_weighted|
+|---|---|---|---|---|
+|Naive Bayes + Chi-square|0.8211|0.8211|0.8138|0.8273|
