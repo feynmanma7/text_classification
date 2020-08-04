@@ -179,6 +179,8 @@ Got another optimization problem,
 
 ## Loss function
 
+Hinge loss, 
 
+> $L(W, b) = \sum_{i=1}^N max(0, 1 - y_i(W^TX_i+b)) + \lambda ||W||^2$
 
 
