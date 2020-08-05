@@ -62,6 +62,7 @@ For text classification,
 
 Naive Bayes + Chi-square (50 words per label)
 
-|method|accuracy|f1_micro|f1_marco|f1_weighted|
-|---|---|---|---|---|
-|Naive Bayes + Chi-square|0.8211|0.8211|0.8138|0.8273|
+|method|accuracy|f1_micro|f1_marco|f1_weighted|Note|
+|---|---|---|---|---|---|
+|Naive Bayes|0.8211|0.8211|0.8138|0.8273|Chi-Square, #50 words per label|
+|Naive Bayes|||||Mutual information, # words per label|
