@@ -63,7 +63,7 @@ if __name__ == '__main__':
     """
 
     mutual_information_dict_path = os.path.join(get_train_data_dir(), "mutual_information.pkl")
-    num_chosen_word = 300
+    num_chosen_word = 500
     select_by_mutual_information(mutual_information_dict_path=mutual_information_dict_path,
                                  chosen_word_dict_path=chosen_word_dict_path,
                                  num_chosen_word=num_chosen_word)

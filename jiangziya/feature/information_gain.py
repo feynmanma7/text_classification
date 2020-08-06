@@ -5,10 +5,10 @@ import numpy as np
 
 
 # information gain = mutual information, only for compute on all of the classes (t, C).
-def compute_mutual_information_on_file(train_data_path=None,
-                                       mutual_information_dict_path=None):
+def compute_information_gain_on_file(train_data_path=None,
+                                       information_gain_dict_path=None):
     # train_data: label_name \t title_words \t text_words, words split by '\s'
-    # mutual_information_dict: {label_name: {word: mutual_information}}
+    # information_gain_dict: {label_name: {word: information_gain}}
 
     label_count_dict = {} # {label_name: count}
 
@@ -69,92 +69,64 @@ def compute_mutual_information_on_file(train_data_path=None,
     print("N = %d" % N)
     # assert total_num_doc == line_cnt
 
-    mutual_information_dict = {}
+    information_gain_dict = {}
 
     label_prob_dict = {}
     for label, label_count in label_count_dict.items():
         label_prob_dict[label] = label_count / N
 
     for word in df_dict:
-        mutual_info = compute_mutual_information(label_word_count_dict=label_word_count_dict,
+        mutual_info = compute_information_gain(label_word_count_dict=label_word_count_dict,
                                                  word_doc_count_dict=df_dict,
-                                                 label_count_dict=label_count_dict,
+                                                 label_prob_dict=label_prob_dict,
                                                  word=word,
                                                  N=N)
 
-        mutual_information_dict[word] = mutual_info
+        information_gain_dict[word] = mutual_info
 
-    with open(mutual_information_dict_path, 'wb') as fw:
-        pickle.dump(mutual_information_dict, fw)
+    with open(information_gain_dict_path, 'wb') as fw:
+        pickle.dump(information_gain_dict, fw)
         print("Write done!")
 
 
-def compute_mutual_information(label_word_count_dict=None,
+def compute_information_gain(label_word_count_dict=None,
                                word_doc_count_dict=None,
-                               label_count_dict=None,
+                               label_prob_dict=None,
                                word=None,
+                               label=None,
                                N=None):
     """
     t: term, word,
     C: Category, class
     mu(t, C) = \sum_t \sum_c p(t, c) \log \frac{p(t, c)}{p(t)p(c)}
 
-             c=1    c=0   total
-    t=1     N(t, c)        N(t)
-    t=0
-    total   N(c)            N
+    For each term, t=1
+
+    mu(t, C_i) = p(t=1, c) \log \frac{p(t=1, c)}{p(t=1)p(c)}
+
+    To count:
+    p(t) = N(t) / N, df of term
+    p(c) = N(c) / N
+    p(t, c) = N(t, c) / N(t, C) = N(t, c) / N(C) = N(t, c) / N, count p[c][t]
     """
 
-    mutual_info = 0
+    info_gain = 0
 
-    N_t = word_doc_count_dict[word]
+    p_t = word_doc_count_dict[word] / N
 
     for label, word_count_dict in label_word_count_dict.items():
-        N_c = label_count_dict[label]
+        p_c = label_prob_dict[label]
         if word not in word_count_dict:
             continue
         N_t_c = word_count_dict[word]
+        p_t_c = N_t_c / N
 
-        mutual_info = _compute_mutual_information(N_t, N_c, N_t_c, N)
+        info_gain += p_t_c * np.log(p_t_c/(p_t * p_c))
 
-    return mutual_info
-
-
-def _compute_mutual_information(N_t, N_c, N_t_c, N):
-    """
-             c=1    c=0   total
-    t=1     N(t,c)         N(t)
-    t=0
-    total   N(c)            N
-    """
-    mutual_info = 0
-
-    p_t_c = N_t_c / N
-    p_t = N_t / N
-    p_c = N_c / N
-
-    p_not_t = 1 - p_t
-    p_not_c = 1 - p_c
-
-    p_not_t_c = p_c - p_t_c
-    p_t_not_c = p_t - p_t_c
-    p_not_t_not_c = 1 - p_t_c - p_not_t_c - p_t_not_c
-
-    mutual_info += _compute_one_mutual_information(p_t_c, p_t, p_c)
-    mutual_info += _compute_one_mutual_information(p_not_t_c, p_not_t, p_c)
-    mutual_info += _compute_one_mutual_information(p_t_not_c, p_t, p_not_c)
-    mutual_info += _compute_one_mutual_information(p_not_t_not_c, p_not_t, p_not_c)
-
-    return mutual_info
+    return info_gain
 
 
-def _compute_one_mutual_information(p_t_c, p_t, p_c):
-    if p_t < 1e-4 or p_c < 1e-4 or p_t_c < 1e-4:
-        return 0
-    return p_t_c * np.log(p_t_c / (p_t * p_c))
-
-
-def test_compute_mutual_information():
+def test_compute_information_gain():
     """
     doc_0: 0: I love you
     doc_1: 0: I love
@@ -164,33 +136,31 @@ def test_compute_mutual_information():
 
     label_word_count_dict = {0: {'I': 2, 'love': 3, 'you': 2}, 1: {'you': 1}}
     word_doc_count_dict = {'I': 2, 'love': 3, 'you': 3}
-    label_count_dict = {0: 3, 1: 1}
+    label_prob_dict = {0: 0.75, 1: 0.25}
 
     words = ['I', 'love', 'you']
     N = 4
 
     for word in words:
-        mutual_info = compute_mutual_information(label_word_count_dict=label_word_count_dict,
+        mutual_info = compute_information_gain(label_word_count_dict=label_word_count_dict,
                                              word_doc_count_dict=word_doc_count_dict,
-                                             label_count_dict=label_count_dict,
+                                             label_prob_dict=label_prob_dict,
                                              word=word,
                                              N=N)
         print('word: %s \tmi=%.4f' % (word, mutual_info))
 
 
 if __name__ == '__main__':
-    test_compute_mutual_information()
-
+    test_compute_information_gain()
 
     train_data_path = os.path.join(get_train_data_dir(), "thucnews_train_seg.txt")
     #train_data_path = os.path.join(get_train_data_dir(), "thucnews_val_seg.txt")
-    mutual_information_dict_path = os.path.join(get_train_data_dir(), "mutual_information.pkl")
+    information_gain_dict_path = os.path.join(get_train_data_dir(), "information_gain.pkl")
     
     start = time.time()
-    compute_mutual_information_on_file(train_data_path=train_data_path,
-                                       mutual_information_dict_path=mutual_information_dict_path)
+    compute_information_gain_on_file(train_data_path=train_data_path,
+                                       information_gain_dict_path=information_gain_dict_path)
     end = time.time()
     last = end - start
-    print("Compute mutual_information done! Lasts %.2fs" % last)
-
+    print("Compute information_gain done! Lasts %.2fs" % last)
 
