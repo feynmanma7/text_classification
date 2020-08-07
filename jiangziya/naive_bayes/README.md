@@ -64,5 +64,11 @@ Naive Bayes + Chi-square (50 words per label)
 
 |method|accuracy|f1_micro|f1_marco|f1_weighted|Note|
 |---|---|---|---|---|---|
-|Naive Bayes|0.8211|0.8211|0.8138|0.8273|Chi-Square, #50 words per label|
-|Naive Bayes|||||Mutual information, # words per label|
+|Naive Bayes|0.8211|0.8211|0.8138|0.8273|Chi-Square, 50 words per label|
+|Naive Bayes|0.1526|0.1526|0.1703|0.1496|Mutual information, total words=300|
+|Naive Bayes|0.6126|0.6126|0.5921|0.6055|MI, 5 words per label
+|Naive Bayes|0.6489|0.6489|0.6396|0.6613|MI, 10 words per label|
+|Naive Bayes|0.5742|0.5742|0.5815|0.6069|MI, 25 words per label|
+|Naive Bayes|0.3940|0.3940|0.4493|0.4329|MI, 50 words per label|
+|Naive Bayes|0.1474|0.1474|0.2428|0.1463|MI, 100 words per label|
+|Naive Bayes|0.0459|0.0459|0.1019|0.0424|MI, 500 words per label|

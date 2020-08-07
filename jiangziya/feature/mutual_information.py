@@ -8,7 +8,7 @@ import numpy as np
 def compute_mutual_information_on_file(train_data_path=None,
                                        mutual_information_dict_path=None):
     # train_data: label_name \t title_words \t text_words, words split by '\s'
-    # mutual_information_dict: {label_name: {word: mutual_information}}
+    # label_mutual_information_dict: {label_name: {word: mutual_information}}
 
     label_count_dict = {} # {label_name: count}
 
@@ -69,23 +69,26 @@ def compute_mutual_information_on_file(train_data_path=None,
     print("N = %d" % N)
     # assert total_num_doc == line_cnt
 
-    mutual_information_dict = {}
+    label_mutual_information_dict = {} # {label: {word: mi}}
 
     label_prob_dict = {}
     for label, label_count in label_count_dict.items():
         label_prob_dict[label] = label_count / N
+        label_mutual_information_dict[label] = {}
 
     for word in df_dict:
-        mutual_info = compute_mutual_information(label_word_count_dict=label_word_count_dict,
+        # mutual_info_dict: {label: mi} for current word
+        mutual_info_dict = compute_mutual_information(label_word_count_dict=label_word_count_dict,
                                                  word_doc_count_dict=df_dict,
                                                  label_count_dict=label_count_dict,
                                                  word=word,
                                                  N=N)
 
-        mutual_information_dict[word] = mutual_info
+        for label, mi in mutual_info_dict.items():
+            label_mutual_information_dict[label][word] = mi
 
     with open(mutual_information_dict_path, 'wb') as fw:
-        pickle.dump(mutual_information_dict, fw)
+        pickle.dump(label_mutual_information_dict, fw)
         print("Write done!")
 
 
@@ -99,13 +102,18 @@ def compute_mutual_information(label_word_count_dict=None,
     C: Category, class
     mu(t, C) = \sum_t \sum_c p(t, c) \log \frac{p(t, c)}{p(t)p(c)}
 
-             c=1    c=0   total
-    t=1     N(t, c)        N(t)
+             c=1    c=0  total
+    t=1     N(t, c)       N(t)
     t=0
-    total   N(c)            N
+    total   N(c1)          N
+
+    For class c_i,
+
+    mu(t, c_i) = \sum_t p(t, c_i) \log \frac{p(t, c_i)}{p(t) p(c_i)}
+
     """
 
-    mutual_info = 0
+    mutual_info_dict = {}
 
     N_t = word_doc_count_dict[word]
 
@@ -115,9 +123,9 @@ def compute_mutual_information(label_word_count_dict=None,
             continue
         N_t_c = word_count_dict[word]
 
-        mutual_info = _compute_mutual_information(N_t, N_c, N_t_c, N)
+        mutual_info_dict[label] = _compute_mutual_information(N_t, N_c, N_t_c, N)
 
-    return mutual_info
+    return mutual_info_dict
 
 
 def _compute_mutual_information(N_t, N_c, N_t_c, N):
@@ -170,12 +178,12 @@ def test_compute_mutual_information():
     N = 4
 
     for word in words:
-        mutual_info = compute_mutual_information(label_word_count_dict=label_word_count_dict,
+        mutual_info_dict = compute_mutual_information(label_word_count_dict=label_word_count_dict,
                                              word_doc_count_dict=word_doc_count_dict,
                                              label_count_dict=label_count_dict,
                                              word=word,
                                              N=N)
-        print('word: %s \tmi=%.4f' % (word, mutual_info))
+        print("word: %s mutual_info_dict %s" % (word, mutual_info_dict))
 
 
 if __name__ == '__main__':
@@ -192,5 +200,6 @@ if __name__ == '__main__':
     end = time.time()
     last = end - start
     print("Compute mutual_information done! Lasts %.2fs" % last)
+
 
 

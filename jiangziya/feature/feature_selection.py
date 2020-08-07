@@ -27,21 +27,19 @@ def select_by_chi_square(chi_square_dict_path=None,
 
 def select_by_mutual_information(mutual_information_dict_path=None,
                          chosen_word_dict_path=None,
-                         num_chosen_word=1000):
-    # mutual_information_dict_path: {word: mutual_information}
+                         max_word_of_label=10000):
+    # label_mutual_information_dict_path: {label: {word: mutual_information}}
     # chosen_word_dict: {word: True}
 
-    with open(mutual_information_dict_path, 'rb') as fr:
-        mutual_information_dict = pickle.load(fr)
-
     chosen_word_dict = {}
-    i = 0
-    for word, mutual_information in sorted(mutual_information_dict.items(),
-                                           key=lambda x:-x[1])[:num_chosen_word]:
-        if i < 10:
-            print(word, mutual_information)
-            i += 1
-        chosen_word_dict[word] = True
+    with open(mutual_information_dict_path, 'rb') as fr:
+        label_mutual_information_dict = pickle.load(fr)
+
+        for label, mutual_info_dict in label_mutual_information_dict.items():
+            # mutual_info_dict: {word: mi}
+            for word, mi in sorted(mutual_info_dict.items(), key=lambda x:-x[1])[:max_word_of_label]:
+                if word not in chosen_word_dict:
+                    chosen_word_dict[word] = True
 
     print("#chosen_word_dict = %d" % len(chosen_word_dict))
     with open(chosen_word_dict_path, 'wb') as fw:
@@ -63,9 +61,9 @@ if __name__ == '__main__':
     """
 
     mutual_information_dict_path = os.path.join(get_train_data_dir(), "mutual_information.pkl")
-    num_chosen_word = 500
+    max_word_of_label = 5
     select_by_mutual_information(mutual_information_dict_path=mutual_information_dict_path,
                                  chosen_word_dict_path=chosen_word_dict_path,
-                                 num_chosen_word=num_chosen_word)
+                                 max_word_of_label=max_word_of_label)
 
     print("Write done!", chosen_word_dict_path)
